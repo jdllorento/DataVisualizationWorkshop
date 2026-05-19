@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import numpy as np
 
 # ==========================================
 # CONFIGURACIÓN DE LA APP
@@ -281,13 +282,19 @@ AI aparece como la única categoría con expansión laboral sostenida.
 """)
 
 
+# ==========================================
+# VISUALIZACIÓN 2 — DETECCIÓN DE ANOMALÍAS
+# ==========================================
 st.header("5. Visualización 2 — Detección de Anomalías")
 
 st.markdown("""
-### Crecimiento vs ajuste laboral por industria
+### Industrias con despidos superiores a lo esperado
 
-Se identifican industrias cuyo nivel de despidos resulta desproporcionado
-respecto a su crecimiento financiero promedio.
+La línea de tendencia representa el comportamiento promedio esperado entre
+crecimiento financiero y volumen de despidos.
+
+La anomalía destacada corresponde a la industria cuyo nivel de despidos
+supera significativamente lo que su crecimiento justificaría.
 """)
 
 # ==========================================
@@ -302,21 +309,34 @@ industry_anomaly = (
     .reset_index()
 )
 
-# Score simple de anomalía
-industry_anomaly["anomaly_score"] = (
-    industry_anomaly["layoffs_count"] *
-    industry_anomaly["revenue_growth_percent"]
+# ==========================================
+# CÁLCULO DE TENDENCIA Y RESIDUALES
+# ==========================================
+x = industry_anomaly["revenue_growth_percent"]
+y = industry_anomaly["layoffs_count"]
+
+coef = np.polyfit(x, y, 1)
+trend = np.poly1d(coef)
+
+industry_anomaly["expected_layoffs"] = trend(x)
+
+industry_anomaly["residual"] = (
+    industry_anomaly["layoffs_count"]
+    - industry_anomaly["expected_layoffs"]
 )
 
-# Industria anómala
+# Industria más anómala
 highlight = industry_anomaly.loc[
-    industry_anomaly["anomaly_score"].idxmax(),
+    industry_anomaly["residual"].idxmax(),
     "industry"
 ]
 
+# ==========================================
+# COLORES
+# ==========================================
 colors = [
-    "#ff2d55" if i == highlight else "#d3d3d3"
-    for i in industry_anomaly["industry"]
+    "#ff2d55" if industry == highlight else "#d3d3d3"
+    for industry in industry_anomaly["industry"]
 ]
 
 # ==========================================
@@ -324,6 +344,7 @@ colors = [
 # ==========================================
 fig_anomaly = go.Figure()
 
+# Puntos de contexto
 fig_anomaly.add_trace(
     go.Scatter(
         x=industry_anomaly["revenue_growth_percent"],
@@ -335,11 +356,31 @@ fig_anomaly.add_trace(
             size=28,
             color=colors,
             line=dict(color="white", width=2)
-        )
+        ),
+        showlegend=False
     )
 )
 
-# Highlight annotation
+# Línea de tendencia
+x_sorted = np.sort(x)
+
+fig_anomaly.add_trace(
+    go.Scatter(
+        x=x_sorted,
+        y=trend(x_sorted),
+        mode="lines",
+        line=dict(
+            dash="dash",
+            color="gray",
+            width=2
+        ),
+        name="Tendencia esperada"
+    )
+)
+
+# ==========================================
+# ANOTACIÓN DE LA ANOMALÍA
+# ==========================================
 selected = industry_anomaly[
     industry_anomaly["industry"] == highlight
 ].iloc[0]
@@ -347,27 +388,35 @@ selected = industry_anomaly[
 fig_anomaly.add_annotation(
     x=selected["revenue_growth_percent"],
     y=selected["layoffs_count"],
-    text=f"{highlight}: crecimiento con alta presión laboral",
+    text=f"{highlight}: despidos superiores a lo esperado",
     showarrow=True,
     arrowhead=2,
-    ax=100,
-    ay=-60
+    ax=110,
+    ay=-60,
+    bgcolor="white"
 )
 
+# ==========================================
+# ESTILO
+# ==========================================
 fig_anomaly.update_layout(
-    title="Anomalía estructural por industria",
+    title="Crecimiento financiero vs despidos promedio",
     xaxis_title="Revenue Growth Promedio (%)",
     yaxis_title="Layoffs Promedio",
     plot_bgcolor="white",
     paper_bgcolor="white",
     font=dict(size=14),
-    showlegend=False
+    margin=dict(l=20, r=20, t=60, b=20)
 )
 
 st.plotly_chart(fig_anomaly, use_container_width=True)
 
+# ==========================================
+# INSIGHT
+# ==========================================
 st.warning(f"""
-**Industria destacada:** {highlight}
+**Anomalía detectada: {highlight}**
 
-Presenta la combinación más extrema de crecimiento financiero y ajuste laboral.
+Esta industria presenta un volumen de despidos significativamente superior
+al esperado para su nivel promedio de crecimiento financiero.
 """)
