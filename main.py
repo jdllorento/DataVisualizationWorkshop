@@ -61,7 +61,7 @@ st.header("2. Mini análisis exploratorio")
 st.subheader("Promedio de despidos por industria")
 
 industry_layoffs = (
-    df.groupby("industry")["layoff_percentage"]
+    df.groupby("industry")["layoffs_count"]
     .mean()
     .sort_values(ascending=False)
     .reset_index()
