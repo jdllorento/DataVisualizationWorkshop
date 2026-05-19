@@ -209,3 +209,73 @@ Con este análisis podemos decidir:
 2. Qué anomalías resaltar
 3. Qué narrativa visual construir
 """)
+
+
+st.header("4. Visualización 1 — Ingeniería de la Atención")
+
+st.markdown("""
+### AI: la excepción en un mercado tech en contracción
+
+Cambio neto de empleo por industria  
+(vacantes abiertas - despidos)
+""")
+
+industry_net = (
+    df.groupby("industry")["net_shift"]
+    .mean()
+    .sort_values()
+    .reset_index()
+)
+
+colors = [
+    "#d3d3d3" if industry != "AI" else "#0066ff"
+    for industry in industry_net["industry"]
+]
+
+fig_attention = go.Figure()
+
+fig_attention.add_trace(
+    go.Bar(
+        x=industry_net["net_shift"],
+        y=industry_net["industry"],
+        orientation="h",
+        marker_color=colors,
+        text=industry_net["net_shift"].round(0),
+        textposition="outside"
+    )
+)
+
+fig_attention.update_layout(
+    title="Cambio neto de empleo por industria",
+    xaxis_title="Open Roles - Layoffs",
+    yaxis_title="",
+    showlegend=False,
+    plot_bgcolor="white",
+    paper_bgcolor="white",
+    font=dict(size=14),
+    margin=dict(l=20, r=20, t=60, b=20)
+)
+
+fig_attention.add_vline(
+    x=0,
+    line_width=2,
+    line_dash="dash",
+    line_color="gray"
+)
+
+fig_attention.add_annotation(
+    x=industry_net[industry_net["industry"] == "AI"]["net_shift"].values[0],
+    y="AI",
+    text="Única industria\ncon crecimiento neto",
+    showarrow=True,
+    arrowhead=2,
+    ax=80,
+    ay=-40
+)
+
+st.plotly_chart(fig_attention, use_container_width=True)
+
+st.info("""
+**Insight:** Mientras la mayoría de industrias tecnológicas presentan contracción neta,
+AI aparece como la única categoría con expansión laboral sostenida.
+""")
