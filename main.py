@@ -279,3 +279,107 @@ st.info("""
 **Insight:** Mientras la mayoría de industrias tecnológicas presentan contracción neta,
 AI aparece como la única categoría con expansión laboral sostenida.
 """)
+
+
+st.header("5. Visualización 2 — Detección de Anomalías")
+
+st.markdown("""
+### Crecimiento financiero con despidos masivos
+
+Detección de empresas que contradicen la intuición:
+crecen financieramente mientras reducen plantilla.
+""")
+
+# ==========================================
+# UMBRALES DE ANOMALÍA
+# ==========================================
+revenue_threshold = df["revenue_growth_percent"].quantile(0.85)
+layoffs_threshold = df["layoffs_count"].quantile(0.85)
+
+df["is_anomaly"] = (
+    (df["revenue_growth_percent"] > revenue_threshold) &
+    (df["layoffs_count"] > layoffs_threshold)
+)
+
+normal_df = df[~df["is_anomaly"]]
+anomaly_df = df[df["is_anomaly"]]
+
+# ==========================================
+# GRÁFICA
+# ==========================================
+fig_anomaly = go.Figure()
+
+# Contexto neutro
+fig_anomaly.add_trace(
+    go.Scatter(
+        x=normal_df["revenue_growth_percent"],
+        y=normal_df["layoffs_count"],
+        mode="markers",
+        marker=dict(
+            color="lightgray",
+            size=8,
+            opacity=0.45
+        ),
+        name="Contexto"
+    )
+)
+
+# Anomalías destacadas
+fig_anomaly.add_trace(
+    go.Scatter(
+        x=anomaly_df["revenue_growth_percent"],
+        y=anomaly_df["layoffs_count"],
+        mode="markers+text",
+        text=anomaly_df["company_name"],
+        textposition="top center",
+        marker=dict(
+            color="#ff2d55",
+            size=14,
+            line=dict(color="white", width=2)
+        ),
+        name="Anomalías"
+    )
+)
+
+# Líneas de referencia
+fig_anomaly.add_vline(
+    x=revenue_threshold,
+    line_dash="dash",
+    line_color="gray"
+)
+
+fig_anomaly.add_hline(
+    y=layoffs_threshold,
+    line_dash="dash",
+    line_color="gray"
+)
+
+# Anotación principal
+if not anomaly_df.empty:
+    first = anomaly_df.iloc[0]
+
+    fig_anomaly.add_annotation(
+        x=first["revenue_growth_percent"],
+        y=first["layoffs_count"],
+        text="Crecimiento alto + despidos masivos",
+        showarrow=True,
+        arrowhead=2,
+        ax=80,
+        ay=-50
+    )
+
+fig_anomaly.update_layout(
+    title="Anomalías corporativas en el mercado tech",
+    xaxis_title="Revenue Growth (%)",
+    yaxis_title="Layoffs Count",
+    plot_bgcolor="white",
+    paper_bgcolor="white",
+    font=dict(size=14)
+)
+
+st.plotly_chart(fig_anomaly, use_container_width=True)
+
+st.warning(f"""
+Se detectaron **{len(anomaly_df)} anomalías**:
+empresas con crecimiento financiero elevado y despidos simultáneamente altos.
+""")
