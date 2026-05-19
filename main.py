@@ -80,6 +80,33 @@ fig1.update_layout(yaxis=dict(categoryorder="total ascending"))
 
 st.plotly_chart(fig1, use_container_width=True)
 
+
+st.subheader("Métricas alternativas")
+
+# Pressure Index
+df["pressure_index"] = df["layoffs_count"] / (df["open_roles"] + 1)
+
+pressure = (
+    df.groupby("industry")["pressure_index"]
+    .mean()
+    .sort_values(ascending=False)
+)
+
+st.write("Pressure Index")
+st.dataframe(pressure)
+
+# Net Shift
+df["net_shift"] = df["open_roles"] - df["layoffs_count"]
+
+net_shift = (
+    df.groupby("industry")["net_shift"]
+    .mean()
+    .sort_values()
+)
+
+st.write("Net Employment Shift")
+st.dataframe(net_shift)
+
 # ------------------------------
 # Open roles por industria
 # ------------------------------
