@@ -433,3 +433,25 @@ st.subheader("Distribución por tamaño de empresa")
 
 size_counts = df["company_size"].value_counts()
 st.dataframe(size_counts)
+
+
+st.subheader("Razones de despido por tamaño de empresa")
+
+selected_size = st.selectbox(
+    "Selecciona tamaño",
+    df["company_size"].unique()
+)
+
+filtered_reason = (
+    df[df["company_size"] == selected_size]["reason_for_layoffs"]
+    .value_counts()
+)
+
+st.dataframe(filtered_reason)
+
+fig_reason_size = px.bar(
+    filtered_reason,
+    title=f"Razones de despido en {selected_size}"
+)
+
+st.plotly_chart(fig_reason_size, use_container_width=True)
