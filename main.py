@@ -417,41 +417,73 @@ y sensación de seguridad laboral.
 
 
 
-st.subheader("Distribución de razones de despido")
+# ==========================================
+# VISUALIZACIÓN 3 — COLAPSO DE CONFIANZA
+# ==========================================
+st.header("6. Visualización 3 — Progresión del deterioro laboral")
 
-reason_counts = df["reason_for_layoffs"].value_counts()
-st.dataframe(reason_counts)
+st.markdown("""
+### La confianza laboral colapsa cuando la contratación se detiene
 
-fig_reason = px.bar(
-    reason_counts,
-    title="Frecuencia por razón de despido"
+La seguridad laboral cae progresivamente a medida que
+las organizaciones transitan desde expansión hacia downsizing.
+""")
+
+trend_order = [
+    "Aggressive Hiring",
+    "Moderate Hiring",
+    "Hiring Freeze",
+    "Downsizing"
+]
+
+hiring_security = (
+    df.groupby("hiring_trend")["job_security_score"]
+    .mean()
+    .reindex(trend_order)
+    .reset_index()
 )
 
-st.plotly_chart(fig_reason, use_container_width=True)
+colors = [
+    "#d3d3d3",
+    "#d3d3d3",
+    "#d3d3d3",
+    "#ff2d55"
+]
 
-st.subheader("Distribución por tamaño de empresa")
+fig_trend = go.Figure()
 
-size_counts = df["company_size"].value_counts()
-st.dataframe(size_counts)
-
-
-st.subheader("Razones de despido por tamaño de empresa")
-
-selected_size = st.selectbox(
-    "Selecciona tamaño",
-    df["company_size"].unique()
+fig_trend.add_trace(
+    go.Bar(
+        x=hiring_security["hiring_trend"],
+        y=hiring_security["job_security_score"],
+        marker_color=colors,
+        text=hiring_security["job_security_score"].round(2),
+        textposition="outside"
+    )
 )
 
-filtered_reason = (
-    df[df["company_size"] == selected_size]["reason_for_layoffs"]
-    .value_counts()
+fig_trend.add_annotation(
+    x="Downsizing",
+    y=hiring_security.iloc[-1]["job_security_score"],
+    text="Punto crítico:\ncolapso de confianza",
+    showarrow=True,
+    arrowhead=2,
+    ax=80,
+    ay=-60
 )
 
-st.dataframe(filtered_reason)
-
-fig_reason_size = px.bar(
-    filtered_reason,
-    title=f"Razones de despido en {selected_size}"
+fig_trend.update_layout(
+    title="Seguridad laboral según etapa de contratación",
+    xaxis_title="Hiring Trend",
+    yaxis_title="Job Security Score",
+    plot_bgcolor="white",
+    paper_bgcolor="white",
+    font=dict(size=14)
 )
 
-st.plotly_chart(fig_reason_size, use_container_width=True)
+st.plotly_chart(fig_trend, use_container_width=True)
+
+st.error("""
+Downsizing presenta la caída más severa de seguridad laboral,
+marcando el punto de ruptura organizacional.
+""")
