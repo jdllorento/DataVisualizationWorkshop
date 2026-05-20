@@ -48,7 +48,6 @@ net_shift = (
 st.header("Visualización 1 — Balance de contratación vs despidos por industria")
 
 st.markdown("""
-### AI: la excepción en un mercado tech en contracción
 
 Cambio neto de empleo por industria  
 (vacantes abiertas - despidos)
@@ -110,23 +109,18 @@ fig_attention.add_annotation(
 st.plotly_chart(fig_attention, use_container_width=True)
 
 st.info("""
-**Insight:** Mientras la mayoría de industrias tecnológicas presentan contracción neta,
-AI aparece como la única categoría con expansión laboral sostenida.
+Mientras la mayoría de industrias están dejando de contratar,
+AI aparece como la única categoría con expansión laboral.
 """)
 
 
 # ==========================================
 # VISUALIZACIÓN 2 — DETECCIÓN DE ANOMALÍAS
 # ==========================================
-st.header("5. Visualización 2 — Detección de Anomalías")
+st.header("Visualización 2 — Vulnerabilidad laboral frente a la automatización")
 
 st.markdown("""
-### Vulnerabilidad laboral frente a la automatización
-
-Cada punto representa una industria.
-
-Se resalta aquella donde la percepción de reemplazo por IA
-es más alta respecto al nivel de seguridad laboral reportado.
+Puntaje de riesgo de reemplazo por IA vs sensación de seguridad laboral
 """)
 
 # ==========================================
@@ -223,7 +217,7 @@ fig_anomaly.add_annotation(
     arrowhead=2,
     ax=100,
     ay=-60,
-    bgcolor="white"
+    bgcolor="black"
 )
 
 # ==========================================
@@ -233,33 +227,24 @@ fig_anomaly.update_layout(
     title="Riesgo percibido de reemplazo vs seguridad laboral",
     xaxis_title="AI Replacement Risk",
     yaxis_title="Job Security Score",
-    plot_bgcolor="white",
-    paper_bgcolor="white",
+    plot_bgcolor="black",
+    paper_bgcolor="black",
     font=dict(size=14),
     margin=dict(l=20, r=20, t=60, b=20)
 )
 
 st.plotly_chart(fig_anomaly, use_container_width=True)
 
-st.warning(f"""
-**Industria crítica detectada: {highlight}**
-
-Presenta la mayor brecha entre percepción de reemplazo automatizado
-y sensación de seguridad laboral.
-""")
 
 
 
 # ==========================================
 # VISUALIZACIÓN 3 — COLAPSO DE CONFIANZA
 # ==========================================
-st.header("6. Visualización 3 — Progresión del deterioro laboral")
+st.header("Visualización 3 — Progresión del deterioro laboral")
 
 st.markdown("""
-### La confianza laboral colapsa cuando la contratación se detiene
-
-La seguridad laboral cae progresivamente a medida que
-las organizaciones transitan desde expansión hacia downsizing.
+La seguridad laboral comparada con la tendencia de contratación de la empresa
 """)
 
 trend_order = [
@@ -309,14 +294,9 @@ fig_trend.update_layout(
     title="Seguridad laboral según etapa de contratación",
     xaxis_title="Hiring Trend",
     yaxis_title="Job Security Score",
-    plot_bgcolor="white",
-    paper_bgcolor="white",
+    plot_bgcolor="black",
+    paper_bgcolor="black",
     font=dict(size=14)
 )
 
 st.plotly_chart(fig_trend, use_container_width=True)
-
-st.error("""
-Downsizing presenta la caída más severa de seguridad laboral,
-marcando el punto de ruptura organizacional.
-""")
