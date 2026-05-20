@@ -414,3 +414,119 @@ st.warning(f"""
 Presenta la mayor brecha entre percepción de reemplazo automatizado
 y sensación de seguridad laboral.
 """)
+
+
+
+# ==========================================
+# VISUALIZACIÓN 3 — PARADOJA DE ADOPCIÓN
+# ==========================================
+st.header("6. Visualización 3 — Paradoja de Adopción")
+
+st.markdown("""
+### Más automatización no siempre implica mejor clima organizacional
+
+Se analiza la relación entre adopción de IA y percepción emocional
+de los empleados por industria.
+""")
+
+# ==========================================
+# AGREGACIÓN
+# ==========================================
+industry_sentiment = (
+    df.groupby("industry")
+    .agg({
+        "ai_adoption_level": "mean",
+        "employee_sentiment": "mean"
+    })
+    .reset_index()
+)
+
+industry_sentiment["gap"] = (
+    industry_sentiment["ai_adoption_level"]
+    - industry_sentiment["employee_sentiment"]
+)
+
+highlight = industry_sentiment.loc[
+    industry_sentiment["gap"].idxmax(),
+    "industry"
+]
+
+industry_sentiment = industry_sentiment.sort_values(
+    "ai_adoption_level"
+)
+
+# ==========================================
+# COLORES
+# ==========================================
+colors = [
+    "#ff9500" if industry == highlight else "#d3d3d3"
+    for industry in industry_sentiment["industry"]
+]
+
+# ==========================================
+# GRÁFICA LOLLIPOP
+# ==========================================
+fig_sentiment = go.Figure()
+
+# Líneas
+for _, row in industry_sentiment.iterrows():
+    fig_sentiment.add_shape(
+        type="line",
+        x0=0,
+        x1=row["ai_adoption_level"],
+        y0=row["industry"],
+        y1=row["industry"],
+        line=dict(color="lightgray", width=3)
+    )
+
+# Puntos
+fig_sentiment.add_trace(
+    go.Scatter(
+        x=industry_sentiment["ai_adoption_level"],
+        y=industry_sentiment["industry"],
+        mode="markers+text",
+        text=industry_sentiment["employee_sentiment"].round(1),
+        textposition="middle right",
+        marker=dict(
+            size=20,
+            color=colors,
+            line=dict(color="white", width=2)
+        ),
+        showlegend=False
+    )
+)
+
+# Anotación
+selected = industry_sentiment[
+    industry_sentiment["industry"] == highlight
+].iloc[0]
+
+fig_sentiment.add_annotation(
+    x=selected["ai_adoption_level"],
+    y=selected["industry"],
+    text=f"{highlight}: alta adopción,\nmenor respuesta emocional",
+    showarrow=True,
+    arrowhead=2,
+    ax=100,
+    ay=-50,
+    bgcolor="white"
+)
+
+fig_sentiment.update_layout(
+    title="Adopción de IA vs sentimiento laboral",
+    xaxis_title="AI Adoption Level",
+    yaxis_title="",
+    plot_bgcolor="white",
+    paper_bgcolor="white",
+    font=dict(size=14),
+    margin=dict(l=20, r=20, t=60, b=20)
+)
+
+st.plotly_chart(fig_sentiment, use_container_width=True)
+
+st.info(f"""
+**Industria destacada: {highlight}**
+
+Presenta la mayor brecha entre avance tecnológico
+y percepción emocional interna.
+""")
