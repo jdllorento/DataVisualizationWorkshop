@@ -288,92 +288,116 @@ AI aparece como la única categoría con expansión laboral sostenida.
 st.header("5. Visualización 2 — Detección de Anomalías")
 
 st.markdown("""
-### El umbral psicológico del reemplazo
+### Vulnerabilidad laboral frente a la automatización
 
-A medida que aumenta la percepción de reemplazo por IA,
-la seguridad laboral disminuye.
+Cada punto representa una industria.
 
-Se destaca la zona crítica donde el riesgo percibido es extremo
-y la confianza laboral colapsa.
+Se resalta aquella donde la percepción de reemplazo por IA
+es más alta respecto al nivel de seguridad laboral reportado.
 """)
 
 # ==========================================
-# DEFINICIÓN DE ANOMALÍA
+# AGREGACIÓN POR INDUSTRIA
 # ==========================================
-risk_threshold = df["ai_replacement_risk"].quantile(0.90)
-security_threshold = df["job_security_score"].quantile(0.10)
-
-df["critical_zone"] = (
-    (df["ai_replacement_risk"] >= risk_threshold) &
-    (df["job_security_score"] <= security_threshold)
+industry_risk = (
+    df.groupby("industry")
+    .agg({
+        "ai_replacement_risk": "mean",
+        "job_security_score": "mean"
+    })
+    .reset_index()
 )
 
-normal_df = df[~df["critical_zone"]]
-critical_df = df[df["critical_zone"]]
+# ==========================================
+# SCORE DE CRITICIDAD
+# ==========================================
+industry_risk["criticality"] = (
+    industry_risk["ai_replacement_risk"]
+    - industry_risk["job_security_score"]
+)
+
+highlight = industry_risk.loc[
+    industry_risk["criticality"].idxmax(),
+    "industry"
+]
+
+# ==========================================
+# COLORES
+# ==========================================
+colors = [
+    "#ff2d55" if industry == highlight else "#d3d3d3"
+    for industry in industry_risk["industry"]
+]
 
 # ==========================================
 # GRÁFICA
 # ==========================================
 fig_anomaly = go.Figure()
 
-# Contexto neutro
 fig_anomaly.add_trace(
     go.Scatter(
-        x=normal_df["ai_replacement_risk"],
-        y=normal_df["job_security_score"],
-        mode="markers",
+        x=industry_risk["ai_replacement_risk"],
+        y=industry_risk["job_security_score"],
+        mode="markers+text",
+        text=industry_risk["industry"],
+        textposition="top center",
         marker=dict(
-            color="lightgray",
-            size=6,
-            opacity=0.25
+            size=28,
+            color=colors,
+            line=dict(color="white", width=2)
         ),
         showlegend=False
     )
 )
 
-# Zona crítica
+# Línea de referencia inversa
+coef = np.polyfit(
+    industry_risk["ai_replacement_risk"],
+    industry_risk["job_security_score"],
+    1
+)
+
+trend = np.poly1d(coef)
+
+x_sorted = np.sort(industry_risk["ai_replacement_risk"])
+
 fig_anomaly.add_trace(
     go.Scatter(
-        x=critical_df["ai_replacement_risk"],
-        y=critical_df["job_security_score"],
-        mode="markers",
-        marker=dict(
-            color="#ff2d55",
-            size=10,
-            opacity=0.85,
-            line=dict(color="white", width=1)
+        x=x_sorted,
+        y=trend(x_sorted),
+        mode="lines",
+        line=dict(
+            dash="dash",
+            color="gray",
+            width=2
         ),
-        showlegend=False
+        name="Tendencia"
     )
 )
 
-# Líneas umbral
-fig_anomaly.add_vline(
-    x=risk_threshold,
-    line_dash="dash",
-    line_color="gray"
-)
+# ==========================================
+# ANOTACIÓN
+# ==========================================
+selected = industry_risk[
+    industry_risk["industry"] == highlight
+].iloc[0]
 
-fig_anomaly.add_hline(
-    y=security_threshold,
-    line_dash="dash",
-    line_color="gray"
-)
-
-# Anotación
 fig_anomaly.add_annotation(
-    x=risk_threshold + 0.5,
-    y=security_threshold - 0.4,
-    text="Zona crítica:\nalta percepción de reemplazo\n+ baja seguridad laboral",
+    x=selected["ai_replacement_risk"],
+    y=selected["job_security_score"],
+    text=f"{highlight}: máxima vulnerabilidad",
     showarrow=True,
     arrowhead=2,
-    ax=90,
+    ax=100,
     ay=-60,
     bgcolor="white"
 )
 
+# ==========================================
+# ESTILO
+# ==========================================
 fig_anomaly.update_layout(
-    title="Riesgo de reemplazo por IA vs seguridad laboral",
+    title="Riesgo percibido de reemplazo vs seguridad laboral",
     xaxis_title="AI Replacement Risk",
     yaxis_title="Job Security Score",
     plot_bgcolor="white",
@@ -385,6 +409,8 @@ fig_anomaly.update_layout(
 st.plotly_chart(fig_anomaly, use_container_width=True)
 
 st.warning(f"""
-**{len(critical_df)} observaciones** se encuentran en la zona crítica:
-alta percepción de reemplazo automatizado y baja seguridad laboral.
+**Industria crítica detectada: {highlight}**
+
+Presenta la mayor brecha entre percepción de reemplazo automatizado
+y sensación de seguridad laboral.
 """)
