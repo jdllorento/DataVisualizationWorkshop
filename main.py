@@ -45,7 +45,7 @@ net_shift = (
 )
 
 
-st.header("Visualización 1 — Ingeniería de la Atención")
+st.header("Visualización 1 — Balance de contratación vs despidos por industria")
 
 st.markdown("""
 ### AI: la excepción en un mercado tech en contracción
@@ -84,8 +84,8 @@ fig_attention.update_layout(
     xaxis_title="Open Roles - Layoffs",
     yaxis_title="",
     showlegend=False,
-    plot_bgcolor="white",
-    paper_bgcolor="white",
+    plot_bgcolor="black",
+    paper_bgcolor="black",
     font=dict(size=14),
     margin=dict(l=20, r=20, t=60, b=20)
 )
