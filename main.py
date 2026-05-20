@@ -15,6 +15,16 @@ st.set_page_config(
 
 st.title("📊 Transformación del empleo tech en la era de la IA")
 
+# ==========================================
+# CARGA DE DATOS
+# ==========================================
+@st.cache_data
+def load_data():
+    df = pd.read_csv("tech_layoffs_hiring_trends_elite_v2.csv")
+    return df
+
+df = load_data()
+
 st.header("4. Visualización 1 — Ingeniería de la Atención")
 
 st.markdown("""
