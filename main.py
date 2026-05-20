@@ -36,7 +36,6 @@ pressure = (
     .sort_values(ascending=False)
 )
 
-st.write("Pressure Index")
 st.dataframe(pressure)
 
 # Net Shift
@@ -48,7 +47,6 @@ net_shift = (
     .sort_values()
 )
 
-st.write("Net Employment Shift")
 st.dataframe(net_shift)
 
 st.header("Visualización 1 — Ingeniería de la Atención")
