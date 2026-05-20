@@ -25,8 +25,6 @@ def load_data():
 
 df = load_data()
 
-st.subheader("Métricas alternativas")
-
 # Pressure Index
 df["pressure_index"] = df["layoffs_count"] / (df["open_roles"] + 1)
 
@@ -36,7 +34,6 @@ pressure = (
     .sort_values(ascending=False)
 )
 
-st.dataframe(pressure)
 
 # Net Shift
 df["net_shift"] = df["open_roles"] - df["layoffs_count"]
@@ -47,7 +44,6 @@ net_shift = (
     .sort_values()
 )
 
-st.dataframe(net_shift)
 
 st.header("Visualización 1 — Ingeniería de la Atención")
 
