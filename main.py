@@ -282,14 +282,109 @@ AI aparece como la única categoría con expansión laboral sostenida.
 """)
 
 
-st.write(df["ai_replacement_risk"].describe())
-st.write(df["job_security_score"].describe())
-st.write(df["employee_sentiment"].describe())
+# ==========================================
+# VISUALIZACIÓN 2 — DETECCIÓN DE ANOMALÍAS
+# ==========================================
+st.header("5. Visualización 2 — Detección de Anomalías")
 
-st.write(
-    df[[
-        "ai_replacement_risk",
-        "job_security_score",
-        "employee_sentiment"
-    ]].corr()
+st.markdown("""
+### El umbral psicológico del reemplazo
+
+A medida que aumenta la percepción de reemplazo por IA,
+la seguridad laboral disminuye.
+
+Se destaca la zona crítica donde el riesgo percibido es extremo
+y la confianza laboral colapsa.
+""")
+
+# ==========================================
+# DEFINICIÓN DE ANOMALÍA
+# ==========================================
+risk_threshold = df["ai_replacement_risk"].quantile(0.90)
+security_threshold = df["job_security_score"].quantile(0.10)
+
+df["critical_zone"] = (
+    (df["ai_replacement_risk"] >= risk_threshold) &
+    (df["job_security_score"] <= security_threshold)
 )
+
+normal_df = df[~df["critical_zone"]]
+critical_df = df[df["critical_zone"]]
+
+# ==========================================
+# GRÁFICA
+# ==========================================
+fig_anomaly = go.Figure()
+
+# Contexto neutro
+fig_anomaly.add_trace(
+    go.Scatter(
+        x=normal_df["ai_replacement_risk"],
+        y=normal_df["job_security_score"],
+        mode="markers",
+        marker=dict(
+            color="lightgray",
+            size=6,
+            opacity=0.25
+        ),
+        showlegend=False
+    )
+)
+
+# Zona crítica
+fig_anomaly.add_trace(
+    go.Scatter(
+        x=critical_df["ai_replacement_risk"],
+        y=critical_df["job_security_score"],
+        mode="markers",
+        marker=dict(
+            color="#ff2d55",
+            size=10,
+            opacity=0.85,
+            line=dict(color="white", width=1)
+        ),
+        showlegend=False
+    )
+)
+
+# Líneas umbral
+fig_anomaly.add_vline(
+    x=risk_threshold,
+    line_dash="dash",
+    line_color="gray"
+)
+
+fig_anomaly.add_hline(
+    y=security_threshold,
+    line_dash="dash",
+    line_color="gray"
+)
+
+# Anotación
+fig_anomaly.add_annotation(
+    x=risk_threshold + 0.5,
+    y=security_threshold - 0.4,
+    text="Zona crítica:\nalta percepción de reemplazo\n+ baja seguridad laboral",
+    showarrow=True,
+    arrowhead=2,
+    ax=90,
+    ay=-60,
+    bgcolor="white"
+)
+
+fig_anomaly.update_layout(
+    title="Riesgo de reemplazo por IA vs seguridad laboral",
+    xaxis_title="AI Replacement Risk",
+    yaxis_title="Job Security Score",
+    plot_bgcolor="white",
+    paper_bgcolor="white",
+    font=dict(size=14),
+    margin=dict(l=20, r=20, t=60, b=20)
+)
+
+st.plotly_chart(fig_anomaly, use_container_width=True)
+
+st.warning(f"""
+**{len(critical_df)} observaciones** se encuentran en la zona crítica:
+alta percepción de reemplazo automatizado y baja seguridad laboral.
+""")
