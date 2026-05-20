@@ -47,7 +47,8 @@ net_shift = (
 st.header("Visualización 1")
 
 st.markdown("""
-Balance de contratación vs despidos por industria 
+Balance de contratación vs despidos por industria
+            
 (vacantes abiertas - despidos)
 """)
 
