@@ -9,7 +9,6 @@ import numpy as np
 # ==========================================
 st.set_page_config(
     page_title="Visualización de Datos - Tech Employment Trends",
-    page_icon="📊",
     layout="wide"
 )
 
@@ -45,11 +44,10 @@ net_shift = (
 )
 
 
-st.header("Visualización 1 — Balance de contratación vs despidos por industria")
+st.header("Visualización 1")
 
 st.markdown("""
-
-Cambio neto de empleo por industria  
+Balance de contratación vs despidos por industria 
 (vacantes abiertas - despidos)
 """)
 
@@ -117,7 +115,7 @@ AI aparece como la única categoría con expansión laboral.
 # ==========================================
 # VISUALIZACIÓN 2 — DETECCIÓN DE ANOMALÍAS
 # ==========================================
-st.header("Visualización 2 — Vulnerabilidad laboral frente a la automatización")
+st.header("Visualización 2")
 
 st.markdown("""
 Puntaje de riesgo de reemplazo por IA vs sensación de seguridad laboral
@@ -241,7 +239,7 @@ st.plotly_chart(fig_anomaly, use_container_width=True)
 # ==========================================
 # VISUALIZACIÓN 3 — COLAPSO DE CONFIANZA
 # ==========================================
-st.header("Visualización 3 — Progresión del deterioro laboral")
+st.header("Visualización 3")
 
 st.markdown("""
 La seguridad laboral comparada con la tendencia de contratación de la empresa
