@@ -107,11 +107,6 @@ fig_attention.add_annotation(
 
 st.plotly_chart(fig_attention, use_container_width=True)
 
-st.info("""
-Mientras la mayoría de industrias están dejando de contratar,
-AI aparece como la única categoría con expansión laboral.
-""")
-
 
 # ==========================================
 # VISUALIZACIÓN 2 — DETECCIÓN DE ANOMALÍAS
@@ -119,7 +114,7 @@ AI aparece como la única categoría con expansión laboral.
 st.header("Visualización 2")
 
 st.markdown("""
-Puntaje de riesgo de reemplazo por IA vs sensación de seguridad laboral
+Puntaje de riesgo de reemplazo por IA vs puntaje de seguridad laboral
 """)
 
 # ==========================================
@@ -223,7 +218,7 @@ fig_anomaly.add_annotation(
 # ESTILO
 # ==========================================
 fig_anomaly.update_layout(
-    title="Riesgo percibido de reemplazo vs seguridad laboral",
+    title="Riesgo de reemplazo vs seguridad laboral",
     xaxis_title="AI Replacement Risk",
     yaxis_title="Job Security Score",
     plot_bgcolor="black",
@@ -243,7 +238,7 @@ st.plotly_chart(fig_anomaly, use_container_width=True)
 st.header("Visualización 3")
 
 st.markdown("""
-La seguridad laboral comparada con la tendencia de contratación de la empresa
+La seguridad laboral comparada con la estrategia de contratación de la empresa
 """)
 
 trend_order = [
@@ -290,7 +285,7 @@ fig_trend.add_annotation(
 )
 
 fig_trend.update_layout(
-    title="Seguridad laboral según etapa de contratación",
+    title="Seguridad laboral según estrategia de contratación",
     xaxis_title="Hiring Trend",
     yaxis_title="Job Security Score",
     plot_bgcolor="black",
