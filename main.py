@@ -43,13 +43,17 @@ net_shift = (
     .sort_values()
 )
 
+st.markdown("""
+## Dashboard de apoyo con fin informativo respecto a las tendencias de empleo en la industria tecnológica, con foco en el impacto de la IA.
+## El mensaje general es que las industrias adoptan la migración hacia la IA de maneras diferentes, en ocasiones generando crecimiento y en otras inestabilidad, planteando la adopción de IA no como algo bueno o malo, sino como un proceso de transformación que requiere adaptación y gestión cuidadosa del talento.
+""")
 
 st.header("Visualización 1")
 
 st.markdown("""
 Balance de contratación vs despidos por industria
             
-(vacantes abiertas - despidos)
+(Vacantes Abiertas - Despidos)
 """)
 
 industry_net = (
@@ -106,6 +110,11 @@ fig_attention.add_annotation(
 )
 
 st.plotly_chart(fig_attention, use_container_width=True)
+
+st.info("""
+**Insight:** Mientras la mayoría de industrias tecnológicas presentan contracción neta,
+AI aparece como la única categoría con expansión laboral sostenida.
+""")
 
 
 # ==========================================
@@ -229,6 +238,10 @@ fig_anomaly.update_layout(
 
 st.plotly_chart(fig_anomaly, use_container_width=True)
 
+st.info("""
+**Insight:** La industria de Redes Sociales presenta una combinación crítica de alto riesgo de reemplazo por IA y baja seguridad laboral, destacándose como la más vulnerable a disrupciones significativa, mientras que otras, como Gaming, muestran perfiles más equilibrados o incluso favorables.
+""")
+
 
 
 
@@ -294,3 +307,7 @@ fig_trend.update_layout(
 )
 
 st.plotly_chart(fig_trend, use_container_width=True)
+
+st.info("""
+**Insight:** Se hace evidente cómo en empresas que tienden a reemplazar talento con IA, la seguridad laboral se desploma, evidenciando un colapso de confianza que podría generar un círculo vicioso de fuga de talento y mayor dependencia de la automatización.
+""")
