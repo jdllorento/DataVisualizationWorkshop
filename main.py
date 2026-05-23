@@ -44,8 +44,8 @@ net_shift = (
 )
 
 st.markdown("""
-# Dashboard de apoyo con fin informativo respecto a las tendencias de empleo en la industria tecnológica, con foco en el impacto de la IA.
-# El mensaje general es que las industrias adoptan la migración hacia la IA de maneras diferentes, en ocasiones generando crecimiento y en otras inestabilidad, planteando la adopción de IA no como algo bueno o malo, sino como un proceso de transformación que requiere adaptación y gestión cuidadosa del talento.
+### Dashboard de apoyo con fin informativo respecto a las tendencias de empleo en la industria tecnológica, con foco en el impacto de la IA.
+### El mensaje general es que las industrias adoptan la migración hacia la IA de maneras diferentes, en ocasiones generando crecimiento y en otras inestabilidad, planteando la adopción de IA no como algo bueno o malo, sino como un proceso de transformación que requiere adaptación y gestión cuidadosa del talento.
 """)
 
 st.header("Visualización 1")
